@@ -19,89 +19,89 @@ local error_hlgroup = 'ErrorMsg'
 local short_line_limit = 20
 
 -- Shows the current line's diagnostics in a floating window.
+-- function show_line_diagnostics()
+--     vim.lsp.diagnostic.show_line_diagnostics({ min = vim.diagnostic.severity.WARNING }, vim.fn.bufnr(''))
+-- end
 function show_line_diagnostics()
-  vim
-    .lsp
-    .diagnostic
-    .show_line_diagnostics({ severity_limit = 'Warning' }, vim.fn.bufnr(''))
+    vim.diagnostic.open_float(nil, {
+        scope = "line",
+        severity = { min = vim.diagnostic.severity.WARNING }
+    })
 end
 
 -- Prints the first diagnostic for the current line.
 function echo_diagnostic()
-  if echo_timer then
-    echo_timer:stop()
-  end
+    if echo_timer then
+        echo_timer:stop()
+    end
 
-  echo_timer = vim.defer_fn(
-    function()
-      local line = vim.fn.line('.') - 1
-      local bufnr = vim.api.nvim_win_get_buf(0)
+    echo_timer = vim.defer_fn(
+        function()
+            local line = vim.fn.line('.') - 1
+            local bufnr = vim.api.nvim_win_get_buf(0)
 
-      if last_echo[1] and last_echo[2] == bufnr and last_echo[3] == line then
-        return
-      end
+            if last_echo[1] and last_echo[2] == bufnr and last_echo[3] == line then
+                return
+            end
 
-      local diags = vim
-        .lsp
-        .diagnostic
-        .get_line_diagnostics(bufnf, line, { severity_limit = 'Warning' })
+            local diags = vim.lsp.diagnostic.get_line_diagnostics(bufnr, line, { min = vim.diagnostic.severity.WARNING })
 
-      if #diags == 0 then
-        -- If we previously echo'd a message, clear it out by echoing an empty
-        -- message.
-        if last_echo[1] then
-          last_echo = { false, -1, -1 }
+            if #diags == 0 then
+                -- If we previously echoed a message, clear it out by echoing an empty message.
+                if last_echo[1] then
+                    last_echo = { false, -1, -1 }
+                    vim.api.nvim_command('echo ""')
+                end
+                return
+            end
 
-          vim.api.nvim_command('echo ""')
-        end
+            last_echo = { true, bufnr, line }
 
-        return
-      end
+            local diag = diags[1]
+            local width = vim.api.nvim_get_option('columns') - 15
+            local lines = vim.split(diag.message, "\n")
+            local message = lines[1]
+            local trimmed = false
 
-      last_echo = { true, bufnr, line }
+            if #lines > 1 and #message <= short_line_limit then
+                message = message .. ' ' .. lines[2]
+            end
 
-      local diag = diags[1]
-      local width = vim.api.nvim_get_option('columns') - 15
-      local lines = vim.split(diag.message, "\n")
-      local message = lines[1]
-      local trimmed = false
+            if width > 0 and #message >= width then
+                message = message:sub(1, width) .. '...'
+            end
 
-      if #lines > 1 and #message <= short_line_limit then
-        message = message .. ' ' .. lines[2]
-      end
+            local kind = 'warning'
+            local hlgroup = warning_hlgroup
 
-      if width > 0 and #message >= width then
-        message = message:sub(1, width) .. '...'
-      end
+            if diag.severity == vim.lsp.protocol.DiagnosticSeverity.Error then
+                kind = 'error'
+                hlgroup = error_hlgroup
+            end
 
-      local kind = 'warning'
-      local hlgroup = warning_hlgroup
+            local chunks = {
+                { kind .. ': ', hlgroup },
+                { message }
+            }
 
-      if diag.severity == vim.lsp.protocol.DiagnosticSeverity.Error then
-        kind = 'error'
-        hlgroup = error_hlgroup
-      end
-
-      local chunks = {
-        { kind .. ': ', hlgroup },
-        { message }
-      }
-
-      vim.api.nvim_echo(chunks, false, {})
-    end,
-    echo_timeout
-  )
+            vim.api.nvim_echo(chunks, false, {})
+        end,
+        echo_timeout
+    )
 end
--- autocmd CursorMoved * :lua echo_diagnostic()
+
 -- Correct way to create the autocommand in Lua
 vim.api.nvim_create_autocmd('CursorMoved', {
     callback = function()
-        echo_diagnostic()  -- Call your custom Lua function here
+        echo_diagnostic() -- Call your custom Lua function here
     end,
 })
 
--- change virtual text to just the square
-vim.diagnostic.config({virtual_text={format=function(d) return "" end}, signs=true})
+-- Change virtual text to just the square
+vim.diagnostic.config({
+    virtual_text = { format = function(d) return "" end },
+    signs = true
+})
+
 -- nnoremap <c-j> <cmd>lua vim.diagnostic.goto_next({float={source=true}})<cr>
 -- nnoremap <c-k> <cmd>lua vim.diagnostic.goto_prev({float={source=true}})<cr>
-
