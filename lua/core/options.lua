@@ -17,7 +17,7 @@ vim.opt.smartindent = true
 vim.opt.autoindent = true
 
 -- vim.cmd [[ set noswapfile ]]
---vim.cmd [[ set termguicolors ]]
+vim.cmd [[ set termguicolors ]]
 vim.cmd("highlight Comment ctermfg=LightBlue guifg=#008080")
 
 --Line numbers
