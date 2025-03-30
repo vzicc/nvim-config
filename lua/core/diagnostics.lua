@@ -44,7 +44,14 @@ function echo_diagnostic()
                 return
             end
 
-            local diags = vim.lsp.diagnostic.get_line_diagnostics(bufnr, line, { min = vim.diagnostic.severity.WARNING })
+            -- local diags = vim.lsp.diagnostic.get_line_diagnostics(bufnr, line, { min = vim.diagnostic.severity.WARNING })
+            
+            local bufnr = vim.api.nvim_get_current_buf()
+            local line = vim.api.nvim_win_get_cursor(0)[1] - 1 -- Get the current line (0-indexed)
+            local diags = vim.diagnostic.get(bufnr, {
+             lnum = line,
+             severity = { min = vim.diagnostic.severity.WARNING }
+            })
 
             if #diags == 0 then
                 -- If we previously echoed a message, clear it out by echoing an empty message.
