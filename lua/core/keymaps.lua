@@ -9,7 +9,7 @@ vim.keymap.set('n', '<leader>h', ':nohlsearch<CR>')
 -- Formatter mapping
 vim.keymap.set('n', '<space>f', function()
             vim.lsp.buf.format { async = true }
-        end, opts)
+        end)
 
 
 -- -- Diagnostics mappings
