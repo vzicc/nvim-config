@@ -1,7 +1,7 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
-vim.opt.backspace = '2'
+vim.opt.backspace = 'indent,eol,start'
 vim.opt.showcmd = true
 vim.opt.laststatus = 2
 vim.opt.autowrite = true
@@ -17,9 +17,7 @@ vim.opt.smartindent = true
 vim.opt.autoindent = true
 
 -- vim.cmd [[ set noswapfile ]]
-vim.cmd [[ set termguicolors ]]
-vim.cmd("highlight Comment ctermfg=LightBlue guifg=#008080")
 
 --Line numbers
-vim.wo.number = true
+vim.opt.number = true
 
