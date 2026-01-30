@@ -1,6 +1,4 @@
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-
+vim.opt.termguicolors = true
 vim.opt.backspace = 'indent,eol,start'
 vim.opt.showcmd = true
 vim.opt.laststatus = 2

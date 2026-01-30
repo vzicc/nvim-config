@@ -16,9 +16,6 @@ vim.opt.rtp:prepend(lazypath)
 
 
 require("core.options")
-require("core.theme")
 require("core.keymaps")
-require("core.lsp")
 require("lazy.lazy")
--- require("plugins")
--- require("core.diagnostics")
+require("core.lsp")
