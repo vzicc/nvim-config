@@ -177,4 +177,33 @@ return {
     -- Mason (Installer for formatters/linters)
     { "mason-org/mason.nvim", opts = {} },
 
+    -- Conform (Formatter Manager)
+    {
+        'stevearc/conform.nvim', config = function()
+            require('conform').setup {
+                formatters_by_ft = {
+                    python = { 'black', 'isort' },
+                    lua = { 'stylua' },
+                    javascript = { 'prettierd' },
+                    typescript = { 'prettierd' },
+                    html = { 'prettierd' },
+                    css = { 'prettierd' },
+                    json = { 'prettierd' },
+                    markdown = { 'prettierd' },
+                },
+                format_on_save = {
+                    timeout_ms = 3000,
+                    lsp_fallback = true,
+                },
+                vim.keymap.set("n", "<leader>f", function()
+                    require("conform").format({
+                    lsp_fallback = true,
+                    async = false,
+                    timeout_ms = 3000, -- 3000ms = 3 seconds
+                })
+                end, { desc = "Format file" })
+            }
+        end
+    }
+
 }
